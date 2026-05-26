@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <textarea id="text">Hello world!</textarea>
+  <select id="voices"></select>
+  <button onclick="speak()">Speak</button>
+
+  <script>
+    const synth = window.speechSynthesis;
+
+    // Load available voices
+    function loadVoices() {
+      const voiceList = synth.getVoices();
+      const sel = document.getElementById('voices');
+      sel.innerHTML = '';
+      voiceList.forEach((v, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `${v.name} [${v.lang}]`;
+        sel.appendChild(opt);
+      });
+    }
+
+    // Voices load async in Chrome
+    if (synth.onvoiceschanged !== undefined)
+      synth.onvoiceschanged = loadVoices;
+    setTimeout(loadVoices, 100);
+
+    function speak() {
+      synth.cancel(); // stop any current speech
+      const utter = new SpeechSynthesisUtterance(
+        document.getElementById('text').value
+      );
+      const voices = synth.getVoices();
+      utter.voice = voices[document.getElementById('voices').value];
+      utter.rate = 1;    // 0.5 – 2
+      utter.pitch = 1;   // 0 – 2
+      utter.volume = 1;  // 0 – 1
+      synth.speak(utter);
+    }
+  </script>
+</body>
+</html>
